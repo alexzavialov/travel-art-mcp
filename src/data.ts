@@ -216,6 +216,40 @@ export const events: ArtEvent[] = [
 
 export const museums: Museum[] = [
   {
+    id: "musee-d-orsay",
+    name: "Musée d'Orsay",
+    city: "Paris",
+    country: "FR",
+    address: "1 rue de la Légion d'Honneur, 75007 Paris, France",
+    geo: { lat: 48.8600, lng: 2.3266 },
+    ticketStandard: 16,
+    ticketReduced: 13,
+    currency: "EUR",
+    openingHours:
+      "Tue–Sun 09:30–18:00; Thu late opening to 21:45 ('L'Heure Orsay' — confirmed alive in 2026, reduced €12 rate after 18:00, last admission 21:00); closed Mondays + 1 May + 25 Dec. First Sunday of every month free for all (confirmed alive 2026). Mandatory timed-entry rule in force 10 March 2026 to summer 2028 (covers Pass holders and free categories).",
+    closedDays: ["Monday", "May 1", "December 25"],
+    url: "https://travel.art/musee-d-orsay-essentials/",
+    summary:
+      "The most comprehensive Impressionist + Post-Impressionist collection in the world, housed in the converted 1900 Beaux-Arts railway station designed by Victor Laloux. Chronological mandate 1848–1914 (Louvre ends where Orsay begins). Top-down 2-hour route: Level 5 (Impressionists — Manet, Monet, Renoir, Degas, Caillebotte, Van Gogh's Bedroom at Arles third version, Cézanne) → Level 2 (Post-Impressionists, Toulouse-Lautrec, Nabis) → Level 0 (Realists + sculpture: Courbet's Origin of the World, Millet's Gleaners) → loop to the famous central nave clock window for the closing photo. Paris Museum Pass covered.",
+    essentialWorks: [
+      "Manet: Olympia + Le Déjeuner sur l'herbe (Level 5)",
+      "Courbet: L'Origine du Monde + Burial at Ornans (Level 0)",
+      "Millet: The Gleaners + The Angelus (Level 0)",
+      "Renoir: Bal du Moulin de la Galette (Level 5)",
+      "Monet: La Gare Saint-Lazare + Rouen Cathedral series (Level 5)",
+      "Degas: The Ballet Class + Little Dancer Aged Fourteen sculpture (Level 5)",
+      "Cézanne: Apples and Oranges + Mont Sainte-Victoire (Level 5)",
+      "Van Gogh: Self-Portrait + Bedroom at Arles (third version, Sept 1889) + Starry Night Over the Rhône + Church at Auvers (Level 5)",
+      "Gauguin: Vairumati + Arearea (Level 2)",
+      "Toulouse-Lautrec: La Toilette + posters (Level 2)",
+      "Seurat: Le Cirque (Level 2)",
+      "Caillebotte: Les Raboteurs de Parquet (Level 5)",
+      "The central nave clock window over Paris",
+    ],
+    routeDuration: "2 hours essential; 3–4 hours including Decorative Arts and Nabis rooms",
+    lastVerified: "2026-05-11",
+  },
+  {
     id: "louvre",
     name: "The Louvre",
     city: "Paris",
@@ -347,4 +381,8 @@ export const META = {
   homepage: "https://travel.art/",
   contact: "mcp@travel.art",
   lastBuilt: "2026-05-11",
+  catalogue: {
+    events: 6,
+    museums: 5,
+  },
 };

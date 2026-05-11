@@ -1,0 +1,15 @@
+name = "travel-art-mcp"
+main = "src/index.ts"
+compatibility_date = "2026-04-01"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+
+# Custom domain — bound separately via Cloudflare API after deploy.
+# routes = [{ pattern = "mcp.travel.art/*", zone_name = "travel.art" }]
+
+[observability]
+enabled = true
+
+[vars]
+SERVER_NAME = "travel.art"
+SERVER_VERSION = "1.0.0"

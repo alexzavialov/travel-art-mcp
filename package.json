@@ -1,18 +1,21 @@
 {
   "name": "travel-art-mcp",
   "version": "1.0.0",
-  "description": "Model Context Protocol server for travel.art — art-tourism data for AI agents.",
+  "description": "Model Context Protocol server for travel.art \u2014 art-tourism data for AI agents.",
   "homepage": "https://mcp.travel.art/",
   "repository": {
     "type": "git",
     "url": "https://github.com/alexzavialov/travel-art-mcp.git"
   },
   "license": "MIT",
-  "main": "src/index.ts",
+  "type": "module",
+  "main": "src/stdio.ts",
   "scripts": {
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
-    "tail": "wrangler tail"
+    "tail": "wrangler tail",
+    "start": "tsx src/stdio.ts",
+    "mcp": "tsx src/stdio.ts"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240909.0",
@@ -29,5 +32,9 @@
     "art",
     "museums",
     "biennale"
-  ]
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "tsx": "^4.19.0"
+  }
 }

@@ -101,12 +101,38 @@ Restart Claude Desktop. The three tools should appear in the available tools lis
 
 Any MCP-capable client that supports Streamable HTTP transport works the same way — point it at `https://mcp.travel.art/`.
 
+### Run locally over stdio
+
+The same catalogue and the same three tools are also available as a local **stdio** MCP server, for clients that prefer a spawned process over a remote URL (and so directory evaluators can introspect the server without hitting the hosted endpoint):
+
+```bash
+git clone https://github.com/alexzavialov/travel-art-mcp.git
+cd travel-art-mcp
+npm install
+npm start          # → npx tsx src/stdio.ts
+```
+
+To wire it into Claude Desktop as a local server instead of the remote URL:
+
+```json
+{
+  "mcpServers": {
+    "travel-art": {
+      "command": "npx",
+      "args": ["tsx", "src/stdio.ts"]
+    }
+  }
+}
+```
+
+The stdio server is functionally identical to the hosted endpoint — same `tools.ts`, same `data.ts`.
+
 ## Catalogue
 
 As of the latest publish:
 
-- **Biennales + art fairs (4):** Venice Biennale 2026, Art Basel Switzerland 2026, Frieze London 2026, Art Basel Miami Beach 2026
-- **Museum essentials (3):** The Louvre, Vatican Museums + Sistine Chapel, Galleria degli Uffizi
+- **Biennales + art fairs (6):** Whitney Biennial 2026, Venice Biennale 2026, Art Basel Switzerland 2026, Frieze London 2026, Art Basel Paris 2026, Art Basel Miami Beach 2026
+- **Museum essentials (12):** The Louvre, Musée d'Orsay, Vatican Museums + Sistine Chapel, Galleria degli Uffizi, Museo del Prado, British Museum, The Met, MoMA, Reina Sofía, Rijksmuseum, Van Gogh Museum, Tate Modern
 - **Growing weekly** as new cornerstone articles publish on travel.art
 
 Each record includes a `lastVerified` ISO date; AI agents that weight freshness can prefer recently-verified records.
@@ -116,14 +142,15 @@ Each record includes a `lastVerified` ISO date; AI agents that weight freshness 
 ```
 src/
   index.ts        # Worker entry — MCP HTTP protocol (JSON-RPC 2.0), GET info page, /health, /robots.txt
-  tools.ts        # Tool definitions + handlers
+  stdio.ts        # Local stdio entry — same tools over MCP stdio transport (@modelcontextprotocol/sdk)
+  tools.ts        # Tool definitions + handlers (shared by both entries)
   data.ts         # Static dataset (typed events + museums)
-package.json      # Minimal — wrangler + workers-types only
+package.json
 tsconfig.json
 wrangler.toml     # Cloudflare Workers config
 ```
 
-Stack: TypeScript, Cloudflare Workers, MCP protocol version `2025-03-26`. No third-party MCP SDK — protocol is implemented directly for Workers compatibility.
+Stack: TypeScript. Two transports share one codebase: the **hosted** entry (`index.ts`) implements MCP HTTP (JSON-RPC 2.0) directly for Cloudflare Workers compatibility; the **local** entry (`stdio.ts`) uses `@modelcontextprotocol/sdk` over stdio. Both serve identical tools from `tools.ts` + `data.ts`.
 
 ## Deploy your own copy
 

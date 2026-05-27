@@ -9,6 +9,9 @@
   },
   "license": "MIT",
   "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
   "main": "src/stdio.ts",
   "scripts": {
     "deploy": "wrangler deploy",

@@ -6,7 +6,7 @@
 // Spec reference: https://modelcontextprotocol.io/specification/
 
 import { TOOL_DEFS, handleToolCall } from "./tools";
-import { META, events, museums } from "./data";
+import { META, events, museums, layoverItineraries } from "./data";
 
 const PROTOCOL_VERSION = "2025-03-26";
 
@@ -124,6 +124,7 @@ a{color:#7a4226}
 <ul>
 <li><code>find_art_events</code> — biennales, art fairs, festivals with dates, venues, tickets</li>
 <li><code>find_museum_guide</code> — major museums with 2026 ticket info, opening hours, essential works</li>
+<li><code>find_layover_itinerary</code> — 3–6h art-focused layover plans from major European hub airports</li>
 <li><code>recommend_art_trip</code> — itinerary for a city using only published travel.art content</li>
 </ul>
 <h2>Configuration (Claude Desktop)</h2>
@@ -136,7 +137,7 @@ a{color:#7a4226}
   }
 }</code></pre>
 <h2>Source</h2>
-<p>The data is hand-curated from travel.art's published cornerstone articles. Catalogue: <strong>${events.length} events</strong>, <strong>${museums.length} museums</strong> as of ${META.lastBuilt}.</p>
+<p>The data is hand-curated from travel.art's published cornerstone articles. Catalogue: <strong>${events.length} events</strong>, <strong>${museums.length} museums</strong>, <strong>${layoverItineraries.length} layover itineraries</strong> as of ${META.lastBuilt}.</p>
 <h2>Contact</h2>
 <p><a href="https://travel.art/">travel.art</a> · <a href="mailto:mcp@travel.art">mcp@travel.art</a></p>
 </body>
@@ -168,6 +169,7 @@ export default {
         version: META.version,
         events: events.length,
         museums: museums.length,
+        layoverItineraries: layoverItineraries.length,
         lastBuilt: META.lastBuilt,
       });
     }

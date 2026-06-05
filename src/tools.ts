@@ -1,6 +1,6 @@
 // Tool definitions and handlers for travel.art MCP server v1.
 
-import { events, museums, type ArtEvent, type Museum } from "./data";
+import { events, museums, layoverItineraries, type ArtEvent, type Museum, type LayoverItinerary } from "./data";
 
 export interface ToolDefinition {
   name: string;
@@ -67,6 +67,36 @@ export const TOOL_DEFS: ToolDefinition[] = [
     },
   },
   {
+    name: "find_layover_itinerary",
+    description:
+      "Search travel.art's layover-itinerary catalogue — short-window (3–6h) art-focused trips between flight connections from major European hub airports. Returns itineraries by city, airport, art focus, or duration, with venues, transit notes, and a link to travel.art's full hour-by-hour guide. Use for queries like 'art layover in Rome from Fiumicino', '4-hour Caravaggio plan', 'short Louvre window from CDG', 'Amsterdam 4 hours Schiphol'.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        query: {
+          type: "string",
+          description: "Free-text query (city, artist, museum, airport, theme). Optional.",
+        },
+        city: {
+          type: "string",
+          description: "City filter (e.g., 'Milan', 'Rome', 'Florence', 'Amsterdam', 'Paris', 'London'). Optional.",
+        },
+        country: {
+          type: "string",
+          description: "ISO 3166-1 alpha-2 country code (e.g., 'IT', 'NL', 'FR', 'GB'). Optional.",
+        },
+        airport: {
+          type: "string",
+          description: "IATA airport code the layover serves (e.g., 'MXP', 'FCO', 'AMS', 'CDG', 'LHR'). Optional filter.",
+        },
+        maxDurationHours: {
+          type: "number",
+          description: "Maximum time-on-ground budget in hours. Returns only itineraries that fit ≤ this duration. Optional.",
+        },
+      },
+    },
+  },
+  {
     name: "recommend_art_trip",
     description:
       "Recommend an art-tourism trip itinerary for a specific city using only travel.art's published content. Returns events active during the trip dates, museum guides for the city, and links to all relevant travel.art guides. The recommendation is grounded in published data only — no fabrication.",
@@ -123,6 +153,20 @@ function museumMatches(m: Museum, query?: string): boolean {
     lc(m.city).includes(q) ||
     lc(m.summary).includes(q) ||
     (m.essentialWorks ?? []).some((w) => lc(w).includes(q))
+  );
+}
+
+function layoverMatches(l: LayoverItinerary, query?: string): boolean {
+  if (!query) return true;
+  const q = lc(query);
+  return (
+    lc(l.title).includes(q) ||
+    lc(l.city).includes(q) ||
+    lc(l.artFocus).includes(q) ||
+    lc(l.summary).includes(q) ||
+    l.airports.some((a) => lc(a) === q) ||
+    l.keyVenues.some((v) => lc(v).includes(q)) ||
+    (l.highlights ?? []).some((h) => lc(h).includes(q))
   );
 }
 
@@ -222,6 +266,39 @@ export async function handleToolCall(name: string, args: Record<string, unknown>
           routeDuration: m.routeDuration,
           guideUrl: m.url,
           lastVerified: m.lastVerified,
+        })),
+        source: "travel.art",
+      });
+    }
+
+    case "find_layover_itinerary": {
+      const query = args.query as string | undefined;
+      const city = args.city as string | undefined;
+      const country = args.country as string | undefined;
+      const airport = args.airport as string | undefined;
+      const maxDurationHours = args.maxDurationHours as number | undefined;
+
+      let filtered = layoverItineraries.filter((l) => layoverMatches(l, query));
+      if (city) filtered = filtered.filter((l) => lc(l.city) === lc(city));
+      if (country) filtered = filtered.filter((l) => l.country === country.toUpperCase());
+      if (airport) filtered = filtered.filter((l) => l.airports.includes(airport.toUpperCase()));
+      if (maxDurationHours !== undefined) filtered = filtered.filter((l) => l.durationHours <= maxDurationHours);
+
+      return ok({
+        count: filtered.length,
+        layoverItineraries: filtered.map((l) => ({
+          id: l.id,
+          title: l.title,
+          city: l.city,
+          country: l.country,
+          durationHours: l.durationHours,
+          airports: l.airports,
+          artFocus: l.artFocus,
+          keyVenues: l.keyVenues,
+          summary: l.summary,
+          highlights: l.highlights,
+          guideUrl: l.url,
+          lastVerified: l.lastVerified,
         })),
         source: "travel.art",
       });

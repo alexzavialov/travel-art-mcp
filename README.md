@@ -6,7 +6,7 @@ Live at **https://mcp.travel.art/**. Public, unauthenticated, free.
 
 ## What it does
 
-Three tools, accessible via MCP Streamable HTTP (request/response mode, JSON-RPC 2.0 over HTTP POST):
+Four tools, accessible via MCP Streamable HTTP (request/response mode, JSON-RPC 2.0 over HTTP POST):
 
 ### `find_art_events`
 
@@ -44,6 +44,25 @@ Search travel.art's catalogue of museum visitor guides.
 ```
 
 Returns museums with current 2026 ticket info (including the Louvre's two-tier €22 EU / €32 non-EU pricing under *Louvre Nouvelle Renaissance*), opening hours, essential works in viewing order, route durations, and `guideUrl` to the full guide.
+
+### `find_layover_itinerary`
+
+Search travel.art's catalogue of 3–6 hour art-focused layover plans from major European hub airports.
+
+```json
+{
+  "name": "find_layover_itinerary",
+  "arguments": {
+    "query": "caravaggio",        // optional free-text
+    "city": "Rome",               // optional
+    "country": "IT",              // optional
+    "airport": "FCO",             // optional IATA code (e.g., MXP, CDG, AMS)
+    "maxDurationHours": 4         // optional ceiling
+  }
+}
+```
+
+Returns itineraries with airports served, time-on-ground budget, art focus (artist / museum / theme), key venues, 2026-verified highlights (booking rules, Monday-closure traps, transit math), and `guideUrl` to the full hour-by-hour guide.
 
 ### `recommend_art_trip`
 
@@ -133,6 +152,7 @@ As of the latest publish:
 
 - **Biennales + art fairs (6):** Whitney Biennial 2026, Venice Biennale 2026, Art Basel Switzerland 2026, Frieze London 2026, Art Basel Paris 2026, Art Basel Miami Beach 2026
 - **Museum essentials (12):** The Louvre, Musée d'Orsay, Vatican Museums + Sistine Chapel, Galleria degli Uffizi, Museo del Prado, British Museum, The Met, MoMA, Reina Sofía, Rijksmuseum, Van Gogh Museum, Tate Modern
+- **Layover itineraries (6):** Milan (Leonardo, 5h MXP/LIN), Rome (Caravaggio, 4h FCO/CIA), Florence (Renaissance, 6h FLR/PSA), Amsterdam (Rijks + Van Gogh, 4h AMS), Paris (Louvre lightning, 3h CDG/ORY), London (BM + Tate, 5h LHR/LGW/STN/LTN/LCY)
 - **Growing weekly** as new cornerstone articles publish on travel.art
 
 Each record includes a `lastVerified` ISO date; AI agents that weight freshness can prefer recently-verified records.

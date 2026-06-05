@@ -45,6 +45,21 @@ export interface Museum {
   lastVerified: string;
 }
 
+export interface LayoverItinerary {
+  id: string;
+  title: string;
+  city: string;
+  country: string; // ISO 3166-1 alpha-2
+  durationHours: number; // total time-on-ground budget in the city
+  airports: string[]; // IATA codes the layover serves (e.g., ["MXP", "LIN"])
+  artFocus: string; // what the itinerary centres on (artist, museum, theme)
+  keyVenues: string[]; // the specific museums/churches visited
+  url: string; // Canonical guide URL on travel.art
+  summary: string;
+  highlights?: string[]; // high-leverage 2026-verified facts
+  lastVerified: string; // ISO 8601 date
+}
+
 export const events: ArtEvent[] = [
   {
     id: "whitney-biennial-2026",
@@ -602,16 +617,167 @@ export const museums: Museum[] = [
   },
 ];
 
+export const layoverItineraries: LayoverItinerary[] = [
+  {
+    id: "milan-leonardo-layover",
+    title: "Milan in 5 Hours: A Leonardo da Vinci Layover from Malpensa or Linate (2026)",
+    city: "Milan",
+    country: "IT",
+    durationHours: 5,
+    airports: ["MXP", "LIN"],
+    artFocus: "Leonardo da Vinci",
+    keyVenues: [
+      "Santa Maria delle Grazie (Last Supper)",
+      "Pinacoteca Ambrosiana (Codex Atlanticus)",
+      "Castello Sforzesco (Sala delle Asse — closed for restoration)",
+    ],
+    url: "https://travel.art/milan-leonardo-layover/",
+    summary:
+      "A time-honest 5-hour Milan layover for Leonardo, with two routes by Last Supper prebooking status. Hour-by-hour from Linate or Malpensa. Skip on Mondays (most key venues closed).",
+    highlights: [
+      "Last Supper requires 60-day advance booking; releases at 09:00 CEST on the 1st of each month and frequently sells out within hours",
+      "Sala delle Asse (Castello Sforzesco) currently closed for restoration — do not route through it in 2026",
+      "Codex Atlanticus at Pinacoteca Ambrosiana is the no-booking-needed Leonardo fallback",
+      "Linate (LIN) is ~25 min to centre by bus 73; Malpensa (MXP) is 50 min via Malpensa Express",
+      "Monday closures sink unprepared layovers — Santa Maria delle Grazie, Pinacoteca di Brera, Ambrosiana all shut",
+    ],
+    lastVerified: "2026-05-12",
+  },
+  {
+    id: "rome-caravaggio-layover",
+    title: "Rome in 4 Hours: A Caravaggio Layover from Fiumicino or Ciampino",
+    city: "Rome",
+    country: "IT",
+    durationHours: 4,
+    airports: ["FCO", "CIA"],
+    artFocus: "Caravaggio",
+    keyVenues: [
+      "San Luigi dei Francesi (Contarelli Chapel: 3 Caravaggios)",
+      "Santa Maria del Popolo (Cerasi Chapel: 2 Caravaggios)",
+      "Sant'Agostino (Madonna of the Pilgrims)",
+    ],
+    url: "https://travel.art/rome-caravaggio-layover/",
+    summary:
+      "A 4-hour FCO/CIA Caravaggio layover hitting three free Baroque churches with six Caravaggios. Total cost ~€20 all-in (transit + chapel-light coins). 6h extension covers Galleria Borghese.",
+    highlights: [
+      "All three churches are FREE — no booking, no tickets, no skip-the-line",
+      "Bring €2 coins for chapel light boxes (paintings are unlit without them)",
+      "Contarelli Chapel (San Luigi dei Francesi) closes 12:30–15:30 daily — plan around the midday gap",
+      "Fiumicino Express train to Termini is 32 min, €14; Ciampino is bus to Termini ~40 min, €6",
+      "6-hour extension: add Galleria Borghese (advance booking required, 2-hour timed slot)",
+    ],
+    lastVerified: "2026-05-12",
+  },
+  {
+    id: "florence-renaissance-layover",
+    title: "Florence in 6 Hours: A Renaissance Sampler Layover from Peretola or Pisa (2026)",
+    city: "Florence",
+    country: "IT",
+    durationHours: 6,
+    airports: ["FLR", "PSA", "BLQ"],
+    artFocus: "Renaissance sampler",
+    keyVenues: [
+      "Galleria degli Uffizi (2-hour shortcut route)",
+      "Brunelleschi Pass venues (Duomo, Baptistery, Campanile, Crypt, Opera Museum)",
+      "Piazza della Signoria + Loggia dei Lanzi (free outdoor sculpture)",
+    ],
+    url: "https://travel.art/florence-renaissance-layover/",
+    summary:
+      "A 6-hour Florence layover with two routes (booked vs no-booking/Monday). Includes €30 Brunelleschi Pass strategy and FLR vs PSA vs BLQ time math for inbound airports.",
+    highlights: [
+      "Brunelleschi Pass (€30, valid 3 days) covers all five Cathedral complex venues — beats individual tickets",
+      "Uffizi requires advance timed-entry booking; the 2-hour route hits Botticelli + Leonardo + Caravaggio + Michelangelo",
+      "FLR (Peretola) is 15 min to centre by tram T2; PSA (Pisa) is 1h by PisaMover + train; BLQ adds ~2h via Marconi Express + Frecciarossa",
+      "Monday closure: Uffizi shut — pivot to Brunelleschi Pass venues which stay open",
+      "Florence flooding November–March can disrupt centre-walking routes",
+    ],
+    lastVerified: "2026-05-16",
+  },
+  {
+    id: "amsterdam-art-layover",
+    title: "Amsterdam in 4 Hours: A Rijksmuseum + Van Gogh Layover from Schiphol (2026)",
+    city: "Amsterdam",
+    country: "NL",
+    durationHours: 4,
+    airports: ["AMS"],
+    artFocus: "Rijksmuseum + Van Gogh Museum",
+    keyVenues: [
+      "Rijksmuseum (Night Watch, Vermeer's Milkmaid, Asian Pavilion)",
+      "Van Gogh Museum (Bedroom, Sunflowers, Almond Blossom, Self-Portrait)",
+      "Museumplein (10-min walk between the two)",
+    ],
+    url: "https://travel.art/amsterdam-art-layover/",
+    summary:
+      "The only 4-hour European art layover that actually works — Schiphol to the Museum Quarter in 25 minutes via the Amsterdam Zuid shortcut. Both Rijks and Van Gogh booking rules + three route plans.",
+    highlights: [
+      "Amsterdam Zuid station (8 min from Schiphol on Sprinter, not the slow tram via Centraal) is the layover-saving shortcut",
+      "Van Gogh Museum: mandatory advance timed-entry; €25; photo ALLOWED inside; I amsterdam Card NOT covered since June 2022",
+      "Rijksmuseum: advance booking strongly recommended; Operation Night Watch Phase 2 restoration scaffolding remains in place through ~2027",
+      "Both museums open daily, no Monday closures — layover-friendly",
+      "Schiphol left-luggage at Schiphol Plaza, 24/7, ~€10/bag/24h",
+    ],
+    lastVerified: "2026-05-16",
+  },
+  {
+    id: "paris-louvre-layover",
+    title: "Paris in 3 Hours: A Louvre Lightning Layover from CDG or Orly",
+    city: "Paris",
+    country: "FR",
+    durationHours: 3,
+    airports: ["CDG", "ORY"],
+    artFocus: "The Louvre (4-work lightning route)",
+    keyVenues: [
+      "The Louvre — Denon Wing (Mona Lisa, Wedding at Cana, Winged Victory of Samothrace, Liberty Leading the People)",
+    ],
+    url: "https://travel.art/paris-louvre-layover/",
+    summary:
+      "An honest 3-hour Paris layover: 60 minutes inside the Louvre buys you one room. Mona Lisa + Wedding at Cana + Winged Victory + Liberty Leading the People. M14 extension from Orly is now the fastest route.",
+    highlights: [
+      "M14 metro extension to Orly (June 2024) makes ORY → Louvre in ~38 min — now faster than CDG which is 50-65 min via RER B + M1",
+      "Louvre EU/non-EU tiered pricing (Louvre Nouvelle Renaissance reform): €22 EU, €32 non-EU",
+      "Closed Tuesdays — most common layover wreck if not checked",
+      "Mona Lisa is in Salle des États (Denon Wing 1st floor) — go DIRECTLY, the queue moves fastest in the first 30 min after opening",
+      "Advance booking via official Louvre site is free, mandatory in practice, and refundable — book even if uncertain about layover timing",
+    ],
+    lastVerified: "2026-05-16",
+  },
+  {
+    id: "london-art-layover",
+    title: "London in 5 Hours: A British Museum + Tate Modern Layover from Heathrow or Gatwick (2026)",
+    city: "London",
+    country: "GB",
+    durationHours: 5,
+    airports: ["LHR", "LGW", "STN", "LTN", "LCY"],
+    artFocus: "British Museum + Tate Modern",
+    keyVenues: [
+      "British Museum (Rosetta Stone, Parthenon Marbles, Egyptian sculpture)",
+      "Tate Modern (Rothko Room, Turbine Hall commission, Level 10 viewing terrace)",
+    ],
+    url: "https://travel.art/london-art-layover/",
+    summary:
+      "A 5-hour London art layover from Heathrow, Gatwick, or London City. British Museum and Tate Modern in 3 hours, both FREE, no booking required, both open Mondays. 2026 fares verified.",
+    highlights: [
+      "Both museums are FREE and OPEN MONDAYS — the rare London layover that works any day of the week",
+      "Elizabeth Line from Heathrow: £15.50 flat fare from 1 March 2026 (was zonal), 32 min to Tottenham Court Road",
+      "Walking route between BM (Bloomsbury) and Tate Modern (Bankside) is 25 min via Holborn + Waterloo Bridge — built into the time budget",
+      "Tate Modern's Hyundai Commission 2026 by Tarek Atoui opens 13 Oct 2026 with Frieze Week (overlaps art-fair travel)",
+      "LCY (London City) is the layover-friendliest London airport — 22 min to Bank on DLR, but limited routes; STN/LTN add 1h+ to the budget",
+    ],
+    lastVerified: "2026-05-16",
+  },
+];
+
 export const META = {
   name: "travel.art",
-  version: "1.3.0",
+  version: "1.4.0",
   description:
-    "Model Context Protocol server for travel.art — exposes structured art-tourism data (events, museums, itineraries) to AI agents.",
+    "Model Context Protocol server for travel.art — exposes structured art-tourism data (events, museums, layover itineraries) to AI agents.",
   homepage: "https://travel.art/",
   contact: "mcp@travel.art",
-  lastBuilt: "2026-05-12",
+  lastBuilt: "2026-06-05",
   catalogue: {
     events: 6,
     museums: 12,
+    layoverItineraries: 6,
   },
 };

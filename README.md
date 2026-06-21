@@ -150,7 +150,7 @@ The stdio server is functionally identical to the hosted endpoint — same `tool
 
 As of the latest publish:
 
-- **Biennales + art fairs (6):** Whitney Biennial 2026, Venice Biennale 2026, Art Basel Switzerland 2026, Frieze London 2026, Art Basel Paris 2026, Art Basel Miami Beach 2026
+- **Art events (22):** 6 cornerstone events (Whitney Biennial, Venice Biennale, Art Basel Switzerland/Paris/Miami, Frieze London) + 16 catalogue events spanning 4 continents — Sydney/Yokohama/Gwangju/Lyon/Manifesta-16 Ruhr biennales; Art Basel Hong Kong, Frieze NY/Seoul, EXPO Chicago, TEFAF NY, The Armory Show, 1-54 London, Art SG art fairs; Rothko/Florence, Raphael/Met, Duchamp/MoMA museum exhibitions
 - **Museum essentials (12):** The Louvre, Musée d'Orsay, Vatican Museums + Sistine Chapel, Galleria degli Uffizi, Museo del Prado, British Museum, The Met, MoMA, Reina Sofía, Rijksmuseum, Van Gogh Museum, Tate Modern
 - **Layover itineraries (6):** Milan (Leonardo, 5h MXP/LIN), Rome (Caravaggio, 4h FCO/CIA), Florence (Renaissance, 6h FLR/PSA), Amsterdam (Rijks + Van Gogh, 4h AMS), Paris (Louvre lightning, 3h CDG/ORY), London (BM + Tate, 5h LHR/LGW/STN/LTN/LCY)
 - **Growing weekly** as new cornerstone articles publish on travel.art

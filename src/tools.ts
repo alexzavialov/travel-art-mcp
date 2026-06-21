@@ -26,7 +26,7 @@ export const TOOL_DEFS: ToolDefinition[] = [
         },
         type: {
           type: "string",
-          enum: ["biennale", "art-fair", "festival"],
+          enum: ["biennale", "art-fair", "festival", "museum-exhibition"],
           description: "Filter by event type. Optional.",
         },
         activeOn: {
@@ -228,6 +228,8 @@ export async function handleToolCall(name: string, args: Record<string, unknown>
           highlights: e.highlights,
           parallelEvents: e.parallelEvents,
           guideUrl: e.url,
+          officialUrl: e.officialUrl,
+          isCornerstone: e.isCornerstone,
           lastVerified: e.lastVerified,
         })),
         source: "travel.art",

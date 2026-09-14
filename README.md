@@ -1,108 +1,75 @@
-# travel.art MCP server
+# mcp/
 
-Model Context Protocol server for [travel.art](https://travel.art/) — art-tourism data (biennales, art fairs, museum visitor guides) exposed to AI agents.
-
-Live at **https://mcp.travel.art/**. Public, unauthenticated, free.
+Model Context Protocol server for travel.art. Live at **https://mcp.travel.art/**.
 
 ## What it does
 
-Four tools, accessible via MCP Streamable HTTP (request/response mode, JSON-RPC 2.0 over HTTP POST):
+Exposes travel.art's art-tourism data to AI agents over the Model Context Protocol (Streamable HTTP transport, request/response mode).
 
-### `find_art_events`
+Three tools as of v1:
 
-Search travel.art's catalogue of biennales, art fairs, and festivals.
+- **`find_art_events`** — biennales, art fairs, festivals with dates, venues, ticket info, summaries, links to full guides
+- **`find_museum_guide`** — major museums (Louvre, Vatican, Uffizi) with 2026 ticket info, opening hours, essential works
+- **`recommend_art_trip`** — city-based itinerary using only published travel.art content
 
-```json
-{
-  "name": "find_art_events",
-  "arguments": {
-    "query": "biennale",      // optional free-text
-    "country": "IT",          // optional ISO 3166-1 alpha-2
-    "type": "art-fair",       // optional: biennale | art-fair | festival
-    "activeOn": "2026-06-20",  // optional ISO 8601 date
-    "startsAfter": "2026-09-01",
-    "endsBefore": "2026-12-31"
-  }
-}
+Catalogue v1.6.0: 23 events + 12 museums + 6 layover itineraries (synced from the published calendar and cornerstone articles; event facts re-verified 2026-09-14).
+
+## Stack
+
+```
+mcp/
+  src/
+    index.ts        # Worker entry, MCP HTTP protocol (JSON-RPC 2.0)
+    tools.ts        # Tool definitions + handlers
+    data.ts         # Static dataset (typed)
+  scripts/          # (Future) sync from content/<slug>/index.md frontmatter
+  data/             # (Future) sync output
+  package.json
+  wrangler.toml
+  tsconfig.json
 ```
 
-Returns events with dates, venues, ticket info, summaries, and the canonical `guideUrl` linking to travel.art's full editorial visitor guide.
+- **Runtime:** Cloudflare Workers, free tier (100k requests/day)
+- **Language:** TypeScript
+- **Transport:** MCP Streamable HTTP (request/response, no SSE — single-shot tool calls)
+- **Protocol version:** `2025-03-26`
+- **Auth:** None (public read-only)
 
-### `find_museum_guide`
+## Use it
 
-Search travel.art's catalogue of museum visitor guides.
-
-```json
-{
-  "name": "find_museum_guide",
-  "arguments": {
-    "query": "louvre",
-    "city": "Paris",
-    "country": "FR"
-  }
-}
-```
-
-Returns museums with current 2026 ticket info (including the Louvre's two-tier €22 EU / €32 non-EU pricing under *Louvre Nouvelle Renaissance*), opening hours, essential works in viewing order, route durations, and `guideUrl` to the full guide.
-
-### `find_layover_itinerary`
-
-Search travel.art's catalogue of 3–6 hour art-focused layover plans from major European hub airports.
-
-```json
-{
-  "name": "find_layover_itinerary",
-  "arguments": {
-    "query": "caravaggio",        // optional free-text
-    "city": "Rome",               // optional
-    "country": "IT",              // optional
-    "airport": "FCO",             // optional IATA code (e.g., MXP, CDG, AMS)
-    "maxDurationHours": 4         // optional ceiling
-  }
-}
-```
-
-Returns itineraries with airports served, time-on-ground budget, art focus (artist / museum / theme), key venues, 2026-verified highlights (booking rules, Monday-closure traps, transit math), and `guideUrl` to the full hour-by-hour guide.
-
-### `recommend_art_trip`
-
-Recommend an art-tourism itinerary for a city. Grounded only in travel.art's published content — no fabrication.
-
-```json
-{
-  "name": "recommend_art_trip",
-  "arguments": {
-    "city": "Florence",
-    "startDate": "2026-06-15",
-    "endDate": "2026-06-18"
-  }
-}
-```
-
-Returns events active during the trip dates plus museum guides for the city, with `guideUrl` for each.
-
-## Quick test
+### Health check
 
 ```bash
-# Health check
 curl https://mcp.travel.art/health
-
-# List tools (MCP)
-curl -X POST https://mcp.travel.art/ \
-  -H 'Content-Type: application/json' \
-  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
-
-# Call a tool
-curl -X POST https://mcp.travel.art/ \
-  -H 'Content-Type: application/json' \
-  -d '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"find_art_events","arguments":{"country":"IT"}}}'
 ```
 
-## Configure your MCP client
+### Initialize handshake
 
-### Claude Desktop
+```bash
+curl -X POST https://mcp.travel.art/ \
+  -H 'Content-Type: application/json' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"my-client","version":"0.1"}}}'
+```
 
-Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or the Windows/Linux equivalent:
+### List tools
+
+```bash
+curl -X POST https://mcp.travel.art/ \
+  -H 'Content-Type: application/json' \
+  -d '{"jsonrpc":"2.0","id":2,"method":"tools/list"}'
+```
+
+### Call a tool
+
+```bash
+curl -X POST https://mcp.travel.art/ \
+  -H 'Content-Type: application/json' \
+  -d '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"find_art_events","arguments":{"country":"IT"}}}'
+```
+
+### Claude Desktop config
+
+Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS):
 
 ```json
 {
@@ -114,91 +81,25 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
 }
 ```
 
-Restart Claude Desktop. The three tools should appear in the available tools list.
-
-### Cursor, Continue, mcp-inspector, your own agent
-
-Any MCP-capable client that supports Streamable HTTP transport works the same way — point it at `https://mcp.travel.art/`.
-
-### Run locally over stdio
-
-The same catalogue and the same three tools are also available as a local **stdio** MCP server, for clients that prefer a spawned process over a remote URL (and so directory evaluators can introspect the server without hitting the hosted endpoint):
+## Deploy
 
 ```bash
-git clone https://github.com/alexzavialov/travel-art-mcp.git
-cd travel-art-mcp
+cd mcp
 npm install
-npm start          # → npx tsx src/stdio.ts
-```
-
-To wire it into Claude Desktop as a local server instead of the remote URL:
-
-```json
-{
-  "mcpServers": {
-    "travel-art": {
-      "command": "npx",
-      "args": ["tsx", "src/stdio.ts"]
-    }
-  }
-}
-```
-
-The stdio server is functionally identical to the hosted endpoint — same `tools.ts`, same `data.ts`.
-
-## Catalogue
-
-As of the latest publish:
-
-- **Art events (22):** 6 cornerstone events (Whitney Biennial, Venice Biennale, Art Basel Switzerland/Paris/Miami, Frieze London) + 16 catalogue events spanning 4 continents — Sydney/Yokohama/Gwangju/Lyon/Manifesta-16 Ruhr biennales; Art Basel Hong Kong, Frieze NY/Seoul, EXPO Chicago, TEFAF NY, The Armory Show, 1-54 London, Art SG art fairs; Rothko/Florence, Raphael/Met, Duchamp/MoMA museum exhibitions
-- **Museum essentials (12):** The Louvre, Musée d'Orsay, Vatican Museums + Sistine Chapel, Galleria degli Uffizi, Museo del Prado, British Museum, The Met, MoMA, Reina Sofía, Rijksmuseum, Van Gogh Museum, Tate Modern
-- **Layover itineraries (6):** Milan (Leonardo, 5h MXP/LIN), Rome (Caravaggio, 4h FCO/CIA), Florence (Renaissance, 6h FLR/PSA), Amsterdam (Rijks + Van Gogh, 4h AMS), Paris (Louvre lightning, 3h CDG/ORY), London (BM + Tate, 5h LHR/LGW/STN/LTN/LCY)
-- **Growing weekly** as new cornerstone articles publish on travel.art
-
-Each record includes a `lastVerified` ISO date; AI agents that weight freshness can prefer recently-verified records.
-
-## Source
-
-```
-src/
-  index.ts        # Worker entry — MCP HTTP protocol (JSON-RPC 2.0), GET info page, /health, /robots.txt
-  stdio.ts        # Local stdio entry — same tools over MCP stdio transport (@modelcontextprotocol/sdk)
-  tools.ts        # Tool definitions + handlers (shared by both entries)
-  data.ts         # Static dataset (typed events + museums)
-package.json
-tsconfig.json
-wrangler.toml     # Cloudflare Workers config
-```
-
-Stack: TypeScript. Two transports share one codebase: the **hosted** entry (`index.ts`) implements MCP HTTP (JSON-RPC 2.0) directly for Cloudflare Workers compatibility; the **local** entry (`stdio.ts`) uses `@modelcontextprotocol/sdk` over stdio. Both serve identical tools from `tools.ts` + `data.ts`.
-
-## Deploy your own copy
-
-```bash
-git clone https://github.com/alexzavialov/travel-art-mcp.git
-cd travel-art-mcp
-npm install
-npx wrangler login                            # if not already
 npx wrangler deploy
 ```
 
-You'll need a Cloudflare account (free tier is sufficient — 100k requests/day).
+(Requires `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` in env or wrangler login.)
 
-To bind to a custom domain, update `wrangler.toml` with a `routes` entry, OR use the Cloudflare dashboard's *Workers → your-worker → Settings → Triggers* to add a Custom Domain.
+The Worker is bound to the `mcp.travel.art` custom domain via Cloudflare API (one-time setup; see DECISIONS.md 2026-05-08).
 
-## Contributing
+## Future (v2 backlog)
 
-Issues and pull requests welcome.
+- **Build-time data extraction** — replace hand-curated `data.ts` with a sync script that reads `content/<slug>/index.md` frontmatter (events from `Event`-typed schema, museums from `Place`-typed schema). New cornerstones flow into MCP automatically.
+- **More tools** — `find_artist_residencies`, `find_collateral_events`, `today_in_art_tourism` (calendar of what's open today across our catalogue).
+- **Authentication tier** — currently public read-only. If commercial clients want high-volume programmatic access, add API-key tier under `Account API Tokens`.
+- **Streaming responses** — for long itinerary recommendations, switch to SSE.
+- **Rate limiting** — per-IP throttle (currently relies on Cloudflare's own DDoS protection).
+- **Schema versioning** — `mcp.travel.art/v1`, `/v2` URL versioning when we break compatibility.
 
-The catalogue (`src/data.ts`) is hand-curated from published cornerstone articles on travel.art. Patches that add new events, museums, or destinations should ideally come with a corresponding visitor guide on travel.art so the `guideUrl` link resolves to substantive content — but exceptions for high-quality factual data (with primary sources cited) are considered.
-
-## License
-
-[MIT](LICENSE). Use it, fork it, deploy your own copy with your own catalogue.
-
-## Contact
-
-- Server-side issues / data corrections: <a href="mailto:mcp@travel.art">mcp@travel.art</a>
-- General travel.art editorial: <a href="mailto:editor@travel.art">editor@travel.art</a>
-- Project home: [travel.art](https://travel.art/)
-- Privacy policy: [travel.art/privacy/](https://travel.art/privacy/)
+See [.claude/agents/mcp-architect.md](../.claude/agents/mcp-architect.md) for the full agent operating spec.

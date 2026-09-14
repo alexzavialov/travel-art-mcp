@@ -227,6 +227,7 @@ export async function handleToolCall(name: string, args: Record<string, unknown>
           summary: e.summary,
           highlights: e.highlights,
           parallelEvents: e.parallelEvents,
+          disclaimer: e.disclaimer,
           guideUrl: e.url,
           officialUrl: e.officialUrl,
           isCornerstone: e.isCornerstone,
@@ -346,6 +347,7 @@ export async function handleToolCall(name: string, args: Record<string, unknown>
           endDate: e.endDate,
           venues: e.venues,
           summary: e.summary,
+          disclaimer: e.disclaimer,
           guideUrl: e.url,
         })),
         museums: cityMuseums.map((m) => ({

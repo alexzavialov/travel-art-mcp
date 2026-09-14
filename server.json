@@ -1,0 +1,31 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "art.travel/mcp",
+  "title": "travel.art",
+  "description": "Art-tourism data for AI agents: biennales, art fairs, museums, layover itineraries with 2026 facts.",
+  "version": "1.6.0",
+  "websiteUrl": "https://travel.art/",
+  "repository": {
+    "url": "https://github.com/alexzavialov/travel-art-mcp",
+    "source": "github"
+  },
+  "icons": [
+    {
+      "src": "https://travel.art/logo-mark.png",
+      "mimeType": "image/png",
+      "sizes": ["512x512"],
+      "theme": "dark"
+    },
+    {
+      "src": "https://travel.art/favicon.svg",
+      "mimeType": "image/svg+xml",
+      "sizes": ["any"]
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.travel.art/"
+    }
+  ]
+}

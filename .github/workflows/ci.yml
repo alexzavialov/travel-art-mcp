@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # 1. Types. Needs devDependencies.
+      - name: Install (full)
+        run: npm ci
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      # 2. Smoke-test the stdio entrypoint the way Glama's evaluation harness does:
+      #    a production-only install, then a real JSON-RPC round trip. This is the
+      #    step that matters — on 2026-09-14 a sync overwrote package.json with the
+      #    Cloudflare Worker version, silently removing "type": "module", the tsx and
+      #    SDK dependencies and the start script. Everything still looked fine on
+      #    GitHub; the server simply stopped being runnable. A production install plus
+      #    one round trip catches that in a minute.
+      - name: Install (production only)
+        run: rm -rf node_modules && npm ci --omit=dev
+
+      - name: Smoke-test stdio server
+        run: |
+          set -euo pipefail
+          printf '%s\n%s\n' \
+            '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"ci","version":"1"}}}' \
+            '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' \
+            | timeout 60 npm start --silent > out.jsonl
+
+          node -e '
+            const fs = require("fs");
+            const pkg = require("./package.json");
+            const lines = fs.readFileSync("out.jsonl", "utf8")
+              .split("\n").filter(l => l.trim().startsWith("{"));
+            const msgs = lines.map(l => JSON.parse(l));
+
+            const init = msgs.find(m => m.id === 1);
+            if (!init || !init.result) throw new Error("no initialize response");
+            const version = init.result.serverInfo.version;
+            if (version !== pkg.version) {
+              throw new Error(`serverInfo.version ${version} != package.json ${pkg.version}`);
+            }
+
+            const list = msgs.find(m => m.id === 2);
+            const tools = list && list.result && list.result.tools;
+            if (!Array.isArray(tools) || tools.length === 0) {
+              throw new Error("tools/list returned nothing — Glama would score this unrunnable");
+            }
+            for (const t of tools) {
+              if (!t.name || !t.description || !t.inputSchema) {
+                throw new Error(`tool ${t.name || "?"} is missing name/description/inputSchema`);
+              }
+            }
+            console.log(`ok — v${version}, ${tools.length} tools: ${tools.map(t => t.name).join(", ")}`);
+          '

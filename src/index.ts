@@ -156,9 +156,24 @@ export default {
       return new Response(null, { status: 204, headers: CORS_HEADERS });
     }
 
+    // A client may open the optional MCP SSE stream with GET. This server
+    // only supports request/response, so signal that explicitly; returning
+    // HTML with 200 makes some clients reconnect repeatedly.
+    const wantsEventStream = request.headers.get("Accept")?.split(",").some(
+      (value) => value.split(";", 1)[0].trim().toLowerCase() === "text/event-stream",
+    );
+    if (request.method === "GET" && (url.pathname === "/" || url.pathname === "/mcp") && wantsEventStream) {
+      return new Response(null, {
+        status: 405,
+        headers: { ...CORS_HEADERS, Allow: "POST, OPTIONS", "Cache-Control": "no-store", Vary: "Accept" },
+      });
+    }
+
     // GET / — human-readable info page
     if ((request.method === "GET" || request.method === "HEAD") && (url.pathname === "/" || url.pathname === "")) {
-      return infoPage();
+      const response = infoPage();
+      response.headers.set("Vary", "Accept");
+      return response;
     }
 
     // GET /health — uptime check
